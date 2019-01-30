@@ -20,16 +20,17 @@ const server = http.createServer((req, res) => {
       body.push(chunk)
     })
 
-    req.on('end', () => {
+    return req.on('end', () => {
       const paresedBody = Buffer.concat(body).toString()
 			// console.log('paresedBody', paresedBody)
       const message = paresedBody.split('=')[1]
 			console.log('message : ', message)
-      fs.writeFileSync('message.txt', message)
+      fs.writeFile('message.txt', message, err => {
+        res.statusCode = 302
+        res.setHeader('Location', '/')
+        return res.end()
+      })
     })
-    res.statusCode = 302
-    res.setHeader('Location', '/')
-    return res.end()
   }
   res.setHeader('Content-Type', 'text/html');
   res.write('<html>');
